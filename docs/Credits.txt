@@ -1,0 +1,20 @@
+Although it seems like PS2ESDL was a "one-man show", the truth was that I did create it with the help of others. :)
+
+Special thanks:
+===============
+Dlanor, for being my guide to the MIPS world in 2009.
+TnA, for contributing ideas.
+l_oliveira, for answering some of my queries about the Playstation 2's hardware, and for supplying sample code on using the original LoadExecPS2() syscall handler of the Playstation 2's BIOS (From Silverbull of the AssemblerGames forum).
+jimmikaelkael, I did base some of the code on Open PS2 Loader's.
+romz, because I had based PS2ESDL's CDVDMAN and CDVDFSV modules on his pseudo code for those modules.
+ragnarok_2040, for helping me with getting the screen positioning correction code working.
+JNABK, for providing the DualShock2 gamepad graphics.
+Mark K., for helping with PS2ESDL's development by contributing ideas, and for volunteering to be a beta tester of the iLink and (early) prototype PS2ESDL features.
+doctorxyz, for helping me with solving some issues with gsKit.
+squallff8, for the default UI design used as of PS2ESDL v0.820.
+
+And to all beta testers (During the closed and open beta testing phrases), contributers and users.
+Without them, PS2ESDL won't be what it is today. :D
+
+If I had missed anyone, it was purely unintentional. :X
+If I truly did miss someone from this list, contact me and I'll give credit to that individual as soon as possible.

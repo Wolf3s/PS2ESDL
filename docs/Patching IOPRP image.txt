@@ -1,0 +1,158 @@
+Patching IOPRPxxx.img images:
+-----------------------------
+
+0. Before patching IOPRP image:
+	1. Read the size of the IOPRP image. Size most be a multiple of 16. (Size of the input buffer)
+	2. Read the image to a free location in memory (Input buffer)
+
+1. Init data:
+	int offset_in; <- Current offset of input buffer containing IOPRP image
+	int offset_out; <- Current offset of output buffer containing IOPRP image
+	romdir_t *romdir_in <- Module entry frame(Input IOPRP buffer). It's moved up by 1 unit for every next module.
+	romdir_t *romdir_out; <- Module entry frame(Output IOPRP buffer). It's moved up by 1 unit for every next module.
+
+	offset_in  = 0; <- Current offset is 0
+	offset_out = 0; <- Current offset is 0
+
+	romdir_in  = (romdir_t*)ioprp_img->data_in; <- 1st module entry
+	romdir_out = (romdir_t*)ioprp_img->data_out; <- 1st module entry
+
+
+2. while(strlen(romdir_in->fileName) > 0) <- Keep going through module entries(Input buffer) until the terminator is reached. This process goes in a loop.
+
+3A. if (!strcmp(romdir_in->fileName, "XXXXX")) <- Compare the module's name, and replace the module accordingly.
+	Modules to replace:
+		EESYNC
+		CDVDMAN
+		CDVDFSV
+
+	Module replacing steps:
+		1. Copy the replacement module from memory (offset_in) to the current output buffer offset (offset_out).
+		2. Update the module's entry information (File size) in the output buffer.
+		3. Increment offset_in and offset_out by the module's size. (whether it is a module that has been replaced or not)
+			The file's size must be rounded off to 16
+
+3B. If the module is other than the modules that need to be replaced:
+		1. Copy the module directly from the input buffer to the output buffer.
+		2. Increment offset_in and offset_out by the module's size. (whether it is a module that has been replaced or not)
+			The file's size must be rounded off to 16
+
+4. For all modules:
+		1. Increment romdir_in and romdir_out by 1.
+
+5. Repeat from step 2 until the last module is reached.
+
+6. Update the output buffer's size information with the last offset in offset_out.
+
+Patching the EELOADCNF image:
+-----------------------------
+
+****EELOADCNF IS A "MINI IOPRP IMAGE" IN rom0!! IT'S NOT A FULL-FLEDGED IOPRP IMAGE, AND IS STRUCTURED DIFFERENTLY!!****
+			IT ALSO DOES NOT CONTAIN ANY IRX MODULES, AND 2 MODULES ARE FORCED IN DURING PATCHING
+
+
+There are only a few sections in EELOADCNF:
+  1. ROMDIR
+  2. EXTINFO
+  3. IOPBTCONF
+
+ROMDIR and EXTINFO are present in all IOPRP images.
+
+0. Before patching IOPRP image:
+	1. Read the size of the IOPRP image. Round off to 16 (Size of the input buffer)
+	2. Read the image to a free location in memory (Input buffer)
+
+1. Init data:
+	int offset_in; <- Current offset of input buffer containing IOPRP image
+	int offset_out; <- Current offset of output buffer containing IOPRP image
+	romdir_t *romdir_in <- Module entry frame(Input IOPRP buffer). It's moved up by 1 unit for every next module.
+	romdir_t *romdir_out; <- Module entry frame(Output IOPRP buffer). It's moved up by 1 unit for every next module.
+
+	offset_in  = 0; <- Current offset is 0
+	offset_out = 0; <- Current offset is 0
+
+	romdir_in  = (romdir_t*)ioprp_img->data_in; <- 1st module entry
+	romdir_out = (romdir_t*)ioprp_img->data_out; <- 1st module entry
+
+
+********** PHRASE 1: PATCHING ROMDIR **********
+
+2. while(strcmp(romdir_in->fileName, "EXTINFO")) <- Before the "EXTINFO" is found,
+	do the following:
+		1. Check to see if the current entry is "ROMDIR"
+			If it is then copy it(offset_in) to the output buffer(offset_out),
+			and increase it's recorded file size information in it's entry by 0x20.
+		2. Increment offset_in and offset_out by the module's size. (whether it is a module that has been replaced or not)
+			The file's size must be rounded off to 16
+		3. Increment romdir_in and romdir_out by 1.
+3. Create 2 new temporary pointers:
+	u8 *p2 = (u8 *)ioprp_img->data_out;
+	u8 *p = (u8 *)ioprp_img->data_in;
+4. Add space before EXTINFO. (The current offset in offset_in and offset_out is at the start of EXTINFO)
+	memcpy(&p2[offset_in+0x20], &p[offset_in], romdir_in->fileSize); <- This moves EXTINFO forward by 0x20 bytes, or creates a space of 0x20 bytes after ROMDIR
+5. Increase the file size reported for EXTINFO.
+	romdir_out->fileSize += 0x18 + 0x18; <- increase it to allow 2 new module entries of 0x18 bytes each. For the replacement CDVDFSV and CDVDMAN modules.
+
+********** PHRASE 2: PATCHING IOPBTCONF and EXTINFO **********
+
+6. Set the following variables to the following values:
+	offset_in  = 0;
+	offset_out = 0;
+
+	romdir_in  = (romdir_t*)ioprp_img->data_in;
+	romdir_out = (romdir_t*)ioprp_img->data_out;
+   ****This is basically to start patching all over again.****
+
+7. while(strlen(romdir_in->fileName) > 0) <- Process all module entries.
+
+   -----IOPBTCONF PATCHING----
+8. if (!strcmp(romdir_in->fileName, "IOPBTCONF")) <- If IOPBTCONF is found
+
+9. When IOPBTCONF is found, copy IOPBTCONF over to the output buffer, at the current offset (Where IOPBTCONF should be)
+
+10. Change any occurances of "NCDVDMAN" or "XCDVDMAN" in IOPBTCONF with "CDVDMAN"
+
+11. Add 2 new module entries after IOPBTCONF's entry:
+	romdir_out++;
+	memcpy(romdir_out, "CDVDMAN\0\0\0\x18\0\0\0\0\0", 0x10);
+	romdir_out++;
+	memcpy(romdir_out, "CDVDFSV\0\0\0\x18\0\0\0\0\0", 0x10);	
+    This are basically the entries for CDVDMAN and CDVDFSV, with their current size stated as 0. Their sizes will be updated later.
+
+   -----EXTINFO PATCHING-----
+11. if (!strcmp(romdir_in->fileName, "EXTINFO")) <- If EXTINFO is found.
+		memcpy((void*)ioprp_img->data_out+offset_out+romdir_in->fileSize, "\0\0\x04\x01\x12\x04\x88\x19\x99\x99\0\x02\0\0\x08\x03""CDVDMAN\0", 0x18);
+		memcpy((void*)ioprp_img->data_out+offset_out+romdir_in->fileSize+0x18, "\0\0\x04\x01\x12\x04\x88\x19\x99\x99\0\x02\0\0\x08\x03""CDVDFSV\0", 0x18);
+	I am not too sure what these 2 lines are added code actually do, but I think that they contain a much higher version number for CDVDFSV and CDVDMAN (So that the IOP would load them instead of those in rom0)
+	These 2 lines of data are added after EXTINFO.
+
+   -----FOR OTHER MODULES IN-BETWEEN----
+12. 
+	1. Increment offset_in and offset_out by the module's size. (whether it is a module that has been replaced or not)
+			The file's size must be rounded off to 16
+	2. Increment romdir_in and romdir_out by 1.
+********** PHRASE 3: PATCHING CDVDMAN and CDVDFSV **********
+13. Before patching the EELOADCNF image:
+	1. Copy the entire EELOADCNF from the output buffer into the input buffer.
+	2. Initilize the following values:
+		offset_in  = 0;
+		offset_out = 0;
+
+		romdir_in  = (romdir_t*)ioprp_img->data_in;
+		romdir_out = (romdir_t*)ioprp_img->data_out;
+   ****This is basically to start patching all over again.****
+
+14. Then the entire process from here on is entirely the same as the IOPRPxxx image patching process from step 2.
+	****HOWEVER, IT DOES NOT COPY IOPBTCONF NOR EXTINFO FROM THE INPUT BUFFER TO THE OUTPUT BUFFER.****
+		This is to reduce patching time (IOPBTCONF and EXTINFO are already in the output buffer). CDVDMAN\CDVDFSV are copied after IOPBTCONF
+
+EXTINFO structure (Something like the one below):
+=================================================
+struct extinfo_entry
+{
+ unsigned int magic; /* 0x01040000 */
+ unsigned int date;  /* e.g. 0x20091113 */
+ unsigned int version; /* 0x02000000 OR'ed with the version number. E.g. version 4.01 is 0x0104 */
+ unsigned int namesize; /* 0x03000000 OR'ed with the length of name */
+ unsigned char* name; /* Name of EXTINFO entry */
+}

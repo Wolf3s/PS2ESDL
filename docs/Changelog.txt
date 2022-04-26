@@ -1,0 +1,1308 @@
+NOTE! The entry at the top is the oldest, and the entry at the bottom is the newest!
+------------------------------------------------------------------------------------
+
+2010/04/16 - v0.715D-LM/v0.720 CB
+=================================
+-Release as a public close-beta build.
+-Edited CDVDMAN to use a fixed iop_event_t structure for creating event flags. This is to reduce stack overflow incidents in sceCdInit().
+
+2010/04/15 - v0.715C-LM
+=======================
+-Edit USBSTOR to use 4096-byte/8-sector reads instead of 2048-byte/4-sector reads.
+
+2010/04/14 - v0.715B-LM
+=======================
+-Removed the derelict "#ifdef DEBUG_TTY_FEEDBACK" define checks from MHookMon. This prevented it from working by excluding critical code from compile time.
+-Corrected cdvdman_open() to return a file's handle's ID instead of the offset of the handle in the list (Which is always 4x it's ID).
+-Edited USBSTOR to NOT read the FAT for consecutive cluster sector numbers (Better performance). Backed up original version in USBSTOR_backup.
+
+2010/05/05 - v0.721-LM
+======================
+CDVDMAN.IRX:
+	-Edited cdvdman_CdSearchFile() and cdvdman_CdReturnFileInfo() to use memcmp() and memcpy() instead of strncmp() and strncpy() respectively.
+	-Fixed a bug in cdvdman_CdReturnFileInfo() which caused it to return the LSN of a file/folder whose name is 3 characters long and has the same 1st letter as the target file.
+	-Fixed cdvdman_open() and cdrom_open() to show the correct stored values during debugging based on the opened file'd file descriptor (cdrom_open() used to display the LSN and size of the file who's fd is 1/4 the correct file's).
+	-Edited cdrom_open() to display the opened file's LSN in hex humbers.
+	-Fixed sceCdPause() -> It caused CDVDMAN to crash because it cleared the interrupt flag's S-command status bit, and it never got set again.
+
+EE core:
+	-Replaced Load_SBV() with a direct call to sbv_patch_enable_lmb(), and also removed the call to and dependency on sbv_patch_disable_prefix_check().
+
+Main GUI:
+	-Removed the call to and dependency on sbv_patch_disable_prefix_check().
+
+Debugging loader:
+	-Removed the call to and dependency on sbv_patch_disable_prefix_check().
+
+USBHDFSD_lite.IRX:
+	-Added IOCTL(), and a IOCTL request that allows the returning of a file's starting LBA (Unused as of yet).
+
+2010/05/12 - v0.722 CB
+======================
+CDVDMAN.IRX:
+	-Fixed sceCdStRead(). It would not read more than 16 sectors, even if more were requested. Fixed this by removing the redundant CDVD_STREAM_NONBLOCK flag check (Causes the PS2 to exit sceCdStRead() at the end of it's 16-sector maximum read cycle before any more can be read).
+	-Fixed various functions to display LSNs as hexidecimal numbers during debugging.
+CDVDFSV.IRX:
+	-Fixed sceCdStread() to display it's arguments in a more generic form during debugging - as some of the arguments fed to it occasionally did not match the displayed label depending on the function requested by the caller.
+MHookMon.IRX:
+	-Added export hooks to SYSMEM's exports 6-10, but disabled the hooking (And generation during compilation) of those functions (Causes IOP reset failures).
+
+2010/05/18 - v0.723 CB
+======================
+CDVDMAN.IRX:
+	-Edit the initilization system to only create and initilize the virtual CD/DVD hardware on a *cold* driver boot. Only the data structures will be reset on CDVDMAN initilizations.
+
+2010/05/20 - v0.723A CB
+=======================
+CDVDMAN.IRX:
+	-Integrated the USB storage device driver into CDVDMAN.
+
+EE core:
+	-Removed the kernel memory functions. Now PS2ESDL no longer uses kernel memory (For compatibility with certain modchips).
+	-Cleaned up some old, unused code (A prototype "HDL mode 3 system").
+
+2010/05/22 - v0.723A CB
+=======================
+EE core:
+	-Modified the IOPRP image patching system to add USBD, and cause the IOP to load it before CDVDMAN.
+	-Combined the IOPRP image generation function with the IOPRP image patching function.
+
+2010/05/22 - v0.723B CB
+=======================
+CDVDMAN.IRX:
+	-Cleaned up the CDVDMAN integrated USBSTOR's code (Old sector reading buffer).
+
+GUI:
+	-Shifted certain parts of CDVDMAN's initilization code to the GUI.
+
+EE core:
+	-Completed a prototype version of v0.723B.
+
+2010/05/23 - v0.723C CB
+=======================
+EE core:
+	-Rigged a USB driver loading system closer to OPL's.... somehow the new IOPRP modification system doesn't generate IOPRP images that the IOP likes.
+	-Fixed all bugs present in the prototype v0.723B
+	-Somehow now quite a few games don't work (Stack issue?).
+
+2010/05/24 - v0.723D CB
+=======================
+CDVDMAN.IRX:
+	-Optimized the external device I/O functions.
+
+GUI:
+	-Changed some debugging strings to make things less confusing.
+
+EE core:
+	-Adjusted the memory address where the patched IOPRP image is stored at (Changed it to 0x00083000).
+		Somehow some games crash when it's set to just directly above the kernel (0x00082000).
+		Perhaps they store some data there?
+		This fixes the last point of the previous changelog entry.
+	-Adjusted the load address for the EE core (Changed from 0x000C8000 to 0x000C9000) due to the change above. This is to ensure that an IOPRP image with a maximum size of 280KB can be stored there.
+
+
+2010/05/26 - v0.723E CB
+=======================
+CDVDMAN:
+	-Cleaned up old, leftover data arrays.
+	-Added RPC 0x80000596.
+	-Improved the file I/O handler system. Now uses structures as file handles instead of a plain, unorganized array of 4 32-byt integers.
+	-As a result of the above, the file opening function, cdrom_open() no longer has to expect cdvdman_open() to return the handle array offset divided by 4 as a valid handle ID.
+
+2010/05/26 - v0.724 CB
+=======================
+CDVDMAN:
+	-Added the IOP_DT_FSEXT flag to the "cdrom" device structure. This fixed games like ToHeart 2.
+	-Somehow... background image loading is now working again. Maybe it's that bug in the EE compiler causing this?
+
+2010/05/29 - v0.724A CB
+=======================
+CDVDMAN:
+	-Removed the media loaded check for the cdrom0 device's DEVCTL function.
+
+2010/05/29 - v0.725 CB
+=======================
+CDVDMAN:
+	-Added a prototype user-resizable sector caching system.
+
+2010/05/30 - v0.725A CB
+=======================
+CDVDMAN:
+	-Added the control options to the GUI for the prototype user-resizable sector caching system.
+	-Added a valid LSN check in the asynchrnous thread. Some buggy (Or just "smart") games like Nascar '09 try to read from invalid sectors.
+
+GUI:
+	-Replaced the "lite" USBHDFSD with the full, original version (But with the GETLBA IOCTL call). The "lite" version seemes to have caused too many problems.
+
+2010/06/03 - v0.726 CB
+=======================
+EESYNC:
+	-Added a scaled-down EESYNC module from PS2ESDL build 091019 (v0.5xx).
+	This is to reduce the amount of redundant code in memory. Some (All?) EESYNC modules allocate a portion of unused memory at startup.
+
+EE_core:
+	-Replaced the function that patched EESYNC with the one from rom0: with one that replaces EESYNC with the "scaled-down" version as above.
+
+2010/06/06 - v0.726A CB
+=======================
+CDVDMAN:
+	-Fixed getstat(), dopen() and dread() functions. They didn't fill the fields in the fio_stat_t structure.
+	-Optimized the integrated USB mass storage driver by making it use static data arrays (Reduced size).
+
+EE_core:
+	-Changed the "lite" USBD driver to the full, original version. This may improve compatibility with games that also use the USB interface... (Provided that the USBD module in the PS2SDK is 100% compatible with SCE's!!)
+
+2010/06/06 - v0.726B CB
+=======================
+CDVDMAN:
+	-Modified cdvdman_CdReturnFileInfo() to return the directory record flags of the opened file.
+	-The above was done, so that dread() can reflect to it's caller whether the returned statistics belong to a file or directory.
+
+EE_core:
+	-Changed the original USBD driver back to the "lite" version. It seems like some games ceased working after swaping to the full version due to a lack of memory.
+
+2010/06/09 - v0.727 CB
+=======================
+CDVDMAN:
+	-Reduced the amount of error checking in the integrated USBSTOR module. Usually, errors don't occur (If they do, the game will crash anyway).
+
+EE_core:
+	-Fixed LoadExecPS2(). It didn't *really* follow SCE's standards.
+
+GUI:
+	-Removed leftover potentially dangerous code that could cause crashes.
+
+2010/06/09 - v0.727A CB
+=======================
+EE_core:
+	-Reverted to the "ideal" EE core system that was envisioned during the development of PS2ESDL v0.5xx.
+
+2010/06/11 - v0.728 CB/v0.730 CB
+================================
+CDVDMAN:
+	-Fixed the STANDBY N-command, as it had caused a similar crash as did the PAUSE N-command.
+	-Fixed the system that emulates the drive status returned by sceCdStatus(). The drive status is now set to "SCECdStatPause" instead of "SCECdStatSpin" whenever the system becomes idle (Fixes games that waits for the drive to become ready through sceCdStatus()).
+		Little Busters! Converted Edition now works.
+
+GUI:
+	Re-added the PS2ESDL format. It uses 4GB disc image slices, and stores the game cache size settings in it's configuration file.
+
+2010/06/16 - v0.730R CB
+=======================
+-Tried to fix the LoadExecPS2() issue by making the EE core similar in structure as OPL's. Failed. Scrapped.
+
+2010/06/16 - v0.731 CB
+======================
+CDVDMAN:
+	-Reduced the amount of code in async_read().
+	-Removed the code in cdvdman_deinit(). Since everything is virtual, no formal deinitilization is necessary. If the IOP was going to be reset, everything will be wiped anyway.
+
+2010/06/17 - v0.731 CB
+======================
+CDVDMAN:
+	-Fixed SceCdTrayReq(). It returned incorrect values for the tray status.
+	-Added a call to cdvdman_initcfg() in cdrom_init(). Some games attempt to send S-commands to the Mechacon before calling sceCdInit().
+		This fixed such games as the event flags will now be initilized (Previously there were not initilized before sceCdInit() was called, and S-command calls will fail).
+
+GUI:
+	-Fixed the version number. It was displaying "PS2ESDL v0.730".
+
+2010/06/21 - v0.732 CB
+======================
+CDVDMAN:
+	-Adjusted the CDVDMAN configuration structure, to use a 32-bit variable instead of a 8-bit for flags (Operating mode).
+
+EE_core:
+	-Added a prototype configuration system, and a prototype HDLoader "mode 3" system.
+	-Created a hybrid IOPRP image patching function like the one used in PS2ESDL v0.723A.
+		The current one was actually probably generating malformed IOPRP images. It was a miracle that PS2ESDL still worked...
+	-Replaced the system that transfers the patched IOPRP image to IOP memory.
+		Previously, this function used the DMA controller. Now it just gets the EE to copy the image into the IOP memory (In kernel mode).
+	-Fixed the SifSetReg() syscall hook. Previously, the SifSetReg() block never seemed to expire.
+
+2010/06/22 - v0.733 CB
+======================
+CDVDMAN:
+	-Reduced the amount of redundant code (Optimized several functions).
+	-Removed/disabled cdvdman_termcall(). This was previously never used (Never called SetRebootTimeLibraryHandlingMode()).
+	-Fixed the reading of the file date.
+	-Fixed getStat();
+
+CDVDFSV:
+	-Reduced the amount of redundant code (Optimized several functions).
+	-Removed checking of the CDVDMAN S-command flag. CDVDFSV will now leave the checking of availability of the MECHACON to CDVDMAN.
+
+2010/06/22 - v0.734 CB
+======================
+CDVDMAN:
+	-Overhauled the whole thing, reducing code...
+
+CDVDFSV:
+	-Fixed the compatibility issue which the file search RPC function has with older SCE libraries (They used a structure of a different size).
+	-Overhauled the whole thing, reducing code...
+
+2010/06/23 - v0.734A CB
+=======================
+CDVDMAN:
+	-Shifted the signaling of the internal "interrupt" end event flag into the function that's invoked during an interrupt.
+		Some games experience crashes due to timming issues with the sceCdSync() and their interrupt callback functions.
+
+2010/06/28 - v0.734B CB
+=======================
+CDVDMAN:
+	-Built a prototype system that triggers a dummy DMA transfer on DMA channel 3. This eliminates the need to wait 100us for the timer to expire (Previously, a hardware timer was used to emulate the DMA channel 3 interrupt callback function).
+
+EE_CORE:
+	-Added a FlushCache(0) call to after the patched IOPRP image gets written to IOP memory. This was to fix the issue of the IOP/EE freezing.
+
+2010/06/28 - v0.734C CB
+=======================
+CDVDMAN:
+	-Reduced the amount of code present by changing the N-command system to a system that functions in a closer way to how a real SCE CDVDMAN would communicate with real CD/DVD hardware.
+
+EESYNC:
+	-Removed the export table.
+
+EE_CORE:
+	-Reverted to using the SIF DMA channel 2 to send the patched IOPRP image to IOP memory.
+	Using the EE to write it directly to IOP memory was great, but this system was too buggy (Frequently caused unpredictable crashes).
+
+2010/06/30 - v0.735 CB
+=======================
+CDVDMAN:
+	-Integrated USBD into CDVDMAN, and reduced the redundant error-checking code (It won't prevent the PS2 from crashing as the calling functions to the function with that piece of code don't handle errors well).
+	-Relocated the code that sets cdvdman_waf, cdvdman_waf2 and cdvdman_syncerr variables into the "real" interrupt handler.
+
+EE_CORE:
+	-Due to the above, SBV patching (Except when debugging) and the loading of USBD has been removed.
+	-Removed the prototype HDLoader Mode 3.
+
+2010/07/06 - v0.735A CB
+=======================
+CDVDMAN:
+	-Fixed the issue of the existance of 3 different file search result structures, but not knowing which one to use.
+	-Created a system that will only emulate the CD/DVD hardware interrupt as needed.
+	-Relocated the code that sets cdvdman_waf, cdvdman_waf2 and cdvdman_syncerr variables into a function that can be called by both a real interrupt handler and the asynchrnous thread.
+
+CDVDFSV:
+	-Fixed the issue of the existance of 3 different file search result structures, but not knowing which one to use.
+
+2010/07/07 - v0.735R CB
+=======================
+EE_CORE:
+	-Changed the amount of space reserved by Install_Kernel_Hooks() for the storage of $ra.
+	-Split LoadExecPS2()'s replacement function into 2 parts, to facilitate a EE soft-reset.
+	-The above was done in a bid to fix the 2nd oldest bug that's still present... but failed.
+
+2010/07/07 - v0.736 CB
+=======================
+CDVDMAN:
+	-Made the cdrom_open() and cdrom_read() functions redirect all file I/O to a replacement, dummy IRX file for banned modules.
+
+2010/07/07 - v0.736A CB
+=======================
+CDVDMAN:
+	-Toned down the system added in the previous build, and added a dummy export table that exports "usbd"'s functions as dummy functions that return 0.
+	-Fixed the power-off callback system. Whether, or why this may affect game compatibility is quite beyong me. :)
+
+2010/07/09 - v0.736B CB
+=======================
+EE_CORE:
+	-Adjusted the address where IOPRP image modification should take place (0x00082000 -> 0x00088000).
+	-Reduced the amount of redundant code.
+
+2010/07/09 - v0.736C CB
+=======================
+CDVDMAN:
+	-Removed some functions that were only present in CDVDMAN modules that will only be found in the BIOS.
+	-Streamlined several functions.
+	-Removed CDVDSTM's export table (It was blank anyway, and no modules will ever link to it).
+
+2010/07/14 - v0.736D CB
+=======================
+CDVDMAN:
+	-Deleted/commented out code that will probably only used by SCE modules.
+
+2010/07/17 - v0.736R CB
+=======================
+CDVDMAN:
+	-Deleted/commented out code that will probably only used by SCE modules.
+	-Replaced links to exports that only return 1 with the dummy expory function (Less redundant code).
+	-Temporary fix for games that *break* the standards set by SCE: Forcing CDVDMAN to read sectors into it's internal buffer, before using memcpy() to send the sectors to the required locations in IOP memory.
+		Those games that need this previously crash CDVDMAN when they specified memory addresses that were NOT aligned to 4-byte boundaries (Doing so on a MIPS is almost suicide, depending on the hardware and software!!).
+	-Streamlined the streaming functions.
+
+2010/07/17 - v0.736E CB
+=======================
+CDVDMAN:
+	-Permanent fix for games that *break* the standards set by SCE by specifying a output buffer that's not aligned to 4-byte boundaries.
+
+2010/07/18 - v0.736F1 CB
+========================
+CDVDMAN:
+	-Special version that does not replace LoadExecPS2() with a custom handler. This one uses the original, SCE LoadExecPS2(). It also saves the patched IOPRP image at 0x01700000 in EE memory */
+	-Re-added code that handles that odd "sce_dev5" signal that's sent to CDVDMAN by some consoles.
+
+2010/07/19 - v0.736F2 CB
+========================
+EE_CORE:
+	-Removed more redundant code.
+	-Edited the memory layout: 0x00097000 will be where the EE core will reside, and 0x000BD000 is where the IOPRP image will be patched at.
+		When debugging, the patched IOPRP image will reside at 0x01700000 instead.
+
+2010/07/21 - v0.736F3 CB
+========================
+EE_CORE:
+	-Removed more redundant code.
+	-Edited the memory layout: 0x00098000 will be where the EE core will reside, and 0x000C0400 is where the IOPRP image will be patched at.
+	-The above fix was conducted to make PS2ESDL work with FAT PS2s with BIOS version 160.
+
+2010/07/21 - v0.736G CB
+========================
+CDVDMAN:
+	-Improved sceCdStRead(). Now it will copy sectors to the target buffers as when they are ready to be copied (Opposed to previously waiting for ALL sectors in the current bank of the ring buffer to be read).
+
+2010/07/22 - v0.736G2 CB
+========================
+EE_core:
+	-Edited the memory layout: 0x00096000 will be where the EE core will reside, and 0x000BE200 is where the IOPRP image will be patched at.
+		This revert was done because the result obtained during tests with the v0.736F2 build was incorrect (Forgot to add the line which adjusts where the memory wipe by LoadExecPS2() will start from).
+
+2010/07/23 - v0.736H CB
+========================
+EE_core:
+	-Reverted to a modified version of the old v0.735A loader. The newer ones are just not efficient enough, especially those that use the original SCE LoadExecPS2(). (Why does it seem like almost all SCE software are that badly optimized?).
+
+CDVDMAN:
+	-CRITICAL!! *** Sometimes *** CDVDMAN will not return the LSN for some files. Who knows why it still worked?
+	-Improved sceCdStRead(). Now it'll check the number of sectors ready to be copied directly, instead of calling sceCdGetReadPos().
+
+2010/07/25 - v0.736H2 CB
+========================
+CDVDMAN:
+	-sceCdStRead() now uses the old system which just calls sceCdSync(0) when the ring buffer "warps around".
+		The "new" system which was supposingly better actually did not offer any performance gain due to the way PS2ESDL's streaming functions were built, but could possibly impact performance negatively by taking up valuable CPU time.
+
+2010/07/26 - v0.736H3 CB
+========================
+CDVDMAN:
+	-Fixed the code which attempts to fix non-ISO9660 compliant filenames specified by calling functions.
+	-Fixed the interrupt callback system.
+
+2010/07/27 - v0.737 CB
+========================
+CDVDMAN:
+	-Reverted back to the CDVDMAN module from v0.736G2, and applied all critical changes made after v0.736G2.
+	-Another attempt to make a better fix for games that attempt to search for/open files without specifying the ";1" suffix in the file's name.
+
+EE_CORE:
+	-Switched back to using the DMAC to send the patched IOPRP image to the IOP.
+
+2010/08/01 - v0.737B CB
+========================
+CDVDMAN:
+	-Adapted CDVDMAN for the fixed PS2ESDL format.
+	-Re-written cdvdman_CdSearchFile() and cdvdman_CdReturnFileInfo() to use structures instead.
+
+GUI:
+	-Changed some debugging strings.
+	-Adapted the EE_CORE configurator for the fixed PS2ESDL format.
+
+2010/08/02 - v0.737C CB
+========================
+CDVDMAN:
+	-Fixed cdvdman_CdReturnFileInfo(). It was previously not searching through the ISO9660 path table properly.
+	-Removed some redundant code which may probably never be called by any game.
+
+GUI:
+	-Change of how PS2ESDL's EE Core works: Now the GUI simply patches the PS2's EE kernel to use the EE core instead of rom0:EELOAD.
+	-PS2ESDL configuration version validation is now working.
+
+EE_CORE:
+	-To fit the above change, the main() function has been modified. The memory wipe and EE peripheral reset have been removed (They will be done by the EE kernel).
+
+2010/08/03 - v0.737D CB
+========================
+CDVDMAN:
+	-Fixed the interrupt emulation system. Some games like Guitar Hero 3 call asynchronous CDVDMAN functions within the interrupt callback, causing a race condition. :(
+
+2010/08/03 - v0.737E CB
+========================
+CDVDMAN:
+	-Re-written sceCdRead(), sceCdRead0(), sceCdRv() to be more "coordinated" and have a reduced amount of redundant code. 
+	-Modified cdvdman_CdSearchFile() for a reduction in redundant code.
+
+2010/08/04 - v0.737F CB
+========================
+EE_CORE:
+	-Added a new, prototype "HDLoader Mode 3" compliant syscall unhooker.
+	-Added an add-on module to enhance the output of IOPTRAP, to make debugging easier.
+	-MHookMon has been temporarily withdrawn from debugging use.
+
+2010/08/04 - v0.737G CB
+========================
+EE_CORE:
+	-Added a fix for that really annoying LoadExecPS2() bug. Yay! :)
+
+CDVDMAN:
+	-Added a call to DelDrv() to accomodate the above fix.
+	-Removed some redundant links to DMACMAN.
+	-Removed sceCdStSeek() (The actual one). Export sceCdStSeekF() in it's place instead.
+
+2010/08/05 - v0.737H CB
+========================
+EE_CORE:
+	-Merged the error trapping components of IOPTRAP into ERRORTRAP.
+
+CDVDMAN:
+	-Fixed sceCdRead*() and CDVDMAN's file I/O functions.
+		Some games will cause a freeze if they attempt to read a file, and read sectors simultaneously.
+	-Reduced the amount of redundant code again.
+CDVDFSV:
+	-Replaced the RPC server dispatcher for RPC 0x80000596 with a function that only returns NULL.
+		The original function wasn't a proper replacement anyway.
+
+2010/08/06 - v0.737I CB
+========================
+CDVDMAN:
+	-Fixed cdvdman_CdSearchFile(). It now does a compatison between the target file entry and the current file directory record/path table entry using the length of the specified file entry's name.
+
+EE_CORE:
+	-Removed some redundant code, and shifted the invoking of sbv_patch_enable_lmb() to directly after the IOP reset with the patched IOPRP image.
+
+2010/08/06 - v0.737J CB
+========================
+CDVDMAN:
+	-Fixed cdvdman_CdSearchFile() and cdvdman_CdReturnFileInfo(). I had misread the ISO9660 specification - apparently there are easier, more bug-free ways to do certain tasks...
+	-Added some parts of a prototype PSS video skipping system.
+
+2010/08/08 - v0.740 CB
+========================
+GUI:
+	-Added a customised background-loader. The loader will check the bitmap's width and height, and exit with an error if the bitmap is too large.
+	-Added another delay when SELECT has been pressed.
+	-Added the ability to configure CDVDMAN to use CD/DVD and/or DNAS key(s) that was/were input by the user.
+	-PS2ESDL format v1.10.
+	-Fixed hotplugging support.
+
+CDVDMAN:
+	-Added the ability to use CD/DVD and/or DNAS key(s) that was/were input by the user.
+
+2010/08/10 - v0.741 CB
+========================
+CDVDMAN:
+	-Cleaned up unused code...
+	-Fixed sceCdBreak(). It doesn't really work when the system is reading data into IOP memory (A really huge, consecutive chunk) because the virtual CD/DVD hardware can't be interrupted... and breaks CDVDMAN's systems instead.
+
+CDVDFSV:
+	-Cleaned up unused code...
+
+EE_CORE:
+	-Removed the SIF IOP reset packet checks for a packet size of 0x70 (Is there even such a situation when a IOP reset packet has such a size?).
+
+2010/08/12 - v0.742 CB
+========================
+CDVDMAN:
+	-Fixed DNAS support.
+
+
+2010/08/13 - v0.743 CB
+========================
+CDVDMAN:
+	-Fixed sceCdReadChain() by changing the system it used (It previously had defunct code left over from the old N-command system used in pre-0.734B builds).
+	-Added a prototype modified module loading blocking system.
+	-Added more code to prevent errors/crashes when searching for files, but specified a non-ISO9660 compliant filename.
+
+2010/08/14 - v0.743A CB
+========================
+CDVDMAN:
+	-Set all dummy modules to return 2 (REMOVABLE_RESIDENT_END) instead.
+	-Cleaned up the list of modules to prevent loading.
+
+EE_CORE:
+	-Fixed the intermittent problems with printf() calls from the EE.
+
+2010/08/16 - v0.743B CB
+========================
+CDVDMAN:
+	-Set all dummy modules to return 2 (REMOVABLE_RESIDENT_END) instead.
+	-Modified the dummy module to handle module unloading properly.
+	-Fixed cdvdman_getstat().
+
+CDVDFSV:
+	-Added a check for MODLOAD's version.
+	-Returns 2 (REMOVABLE_RESIDENT) if MODLOAD's version is 1.04 or newer.
+
+2010/08/16 - v0.743C CB
+========================
+CDVDMAN:
+	-Added a system that handles unaligned buffers in EE memory.
+
+2010/08/17 - v0.743D CB
+========================
+CDVDMAN:
+	-Fixed the system that handles unaligned buffers in EE memory.
+
+EE_CORE:
+	-Some tweaks to the syscall hooks, to prevent possible crashes caused by assembler optimization.
+
+2010/08/18 - v0.743E CB
+========================
+CDVDMAN:
+	-Further optimization...
+	-Finally KILLED that EXTREMELY IRRITATING issue with unaligned EE memory buffers.
+
+CDVDFSV:
+	-Added the part of the statement in cdvdfsv_readee() that stores the result from sceCdApplyNCmd().
+		Previously, cdvdfsv_readee() may not return the correct value (Since it didn't have code to do that at all) that reflects thr true status of it's operations.
+
+2010/08/18 - v0.743F CB
+========================
+CDVDMAN:
+	-Fixed the return value of getstat().
+	-Fixed getstat(). It did not set the cdvdman_read_ef flag if the search for the file failed (This causes any other device function calls to fail).
+	-Added a compatibility mode: Force Synchronization. Some games have limited read retries, and freeze due to the USB device's transfer rate being too low.
+
+GUI:
+	-Added a compatibility mode: Force Synchronization. Some games have limited read retries, and freeze due to the USB device's transfer rate being too low.
+
+2010/08/19 - v0.744 CB
+========================
+CDVDFSV:
+	-Changed the method of determining MODLOAD's version to a lighter one.
+	-Removed redundant structure/variable/array alignment.
+
+EE_core:
+	-Re-write of the syscall hooks to become more efficient.
+
+2010/08/20 - v0.744 CB
+========================
+GUI:
+	-Made the GUI more "professional" looking. :)
+
+EE_core:
+	-Added a prototype ELF patch handling and application system.
+	-Fixed the syscall unhooking system.
+
+2010/08/21 - v0.744 CB
+========================
+CDVDMAN:
+	-Fixed the value returned by sceCdGetReadPos().
+	-Fixed the problem which occurs when a game calls sceCdBreak(), and then calls sceCdRead() later on.
+
+GUI:
+	-Bug fixes for the patch application system.
+	-Added the function to load a background from mc0 or mc1.
+
+EE_core:
+	-Bug fixes for the patch application system.
+
+2010/08/22 - v0.744 CB
+========================
+CDVDMAN:
+	-Reduction in code that will probably never ever be executed by any game.
+	-Shifted the registeration of USBD's exports into USBD itself.
+	-Seperated USBD's exports into it's own export table file.
+	-Re-fixed the value returned by sceCdGetReadPos(). The copy of CDVDMAN was accidentally reverted to a earlier copy. This fix should be better than the one yesterday...
+
+GUI:
+	-Fixed loading of a background from a memory card (It used to try to load a background, before initilizing the GS).
+
+2010/08/23 - v0.744 CB
+========================
+CDVDMAN:
+	-Reduction in code that will probably never ever be executed by any game.
+	-Shifted the registeration of USBD's exports into USBD itself.
+	-Seperated USBD's exports into it's own export table file.
+	-Re-fixed the value returned by sceCdGetReadPos(). The copy of CDVDMAN was accidentally reverted to a earlier copy. This fix should be better than the one yesterday...
+
+GUI:
+	-Changed the filename, and the place where PS2ESDL will look for a patch file to load.
+	-Added PNG support, replacing the traditional bitmap background loading systems.
+
+2010/08/24 - v0.744 CB
+========================
+CDVDMAN:
+	-Reduced the number of literations of "cdrom" in CDVDMAN by 1. ;d
+
+EE_CORE:
+	-Special, prototype version. It's very small, small enough to fit within the exact space taken up by rom0:EELOAD when loaded into it's place.
+
+2010/08/24 - v0.744-LM CB
+======================-==
+EE_CORE:
+	-Finally beaten "Sonic Unleashed". :)
+	-New EE core again... but a very small one.
+
+2010/08/25 - v0.744 CB
+========================
+*** The "LM" EE core became the core used for mainstream builds. ***
+
+CDVDMAN:
+	-Fixed cdvdman_CdReturnFileInfo() to handle dopen() requests for the root directory of the disc.
+	-Increased the maximum of open file handles to 24 from 8.
+
+CDVDFSV:
+	-Fix: Returns the value of sceCdBreak(). Previously, the part of the code that returns the value returned by sceCdBreak() was missing.
+
+2010/08/25 - v0.744 CB
+========================
+CDVDMAN:
+	-Fixed cdvdman_CdSearchFile(). It would occasionally use the LSN of another file/folder with a name that's partially similar to the file/directory being searched for. Horrible, old bug. :<
+
+GUI:
+	-Minor, cosmetic fix to the GUI: There was an extra space before the words "UP/DOWN".
+
+2010/09/02 - v0.744 CB
+========================
+CDVDMAN:
+	-Reduction in code size.
+	-Changed the file handle management system. This new one doesn't have a fixed number of allocatable handles.
+	-Added 1 line to fix GOW2: f->mode=O_RDONLY.
+
+GUI:
+	-Suspended the loading of a background from MC. It seems to crash something (Magicgate authentication fails) on the IOP when the MC can't be accessed. :(
+	-Upgraded the scrolling bar (Now it doesn't scroll when there are few games to list).
+
+EE_CORE:
+	-Cleaned up some code.
+
+Global:
+	-Removed MHookMon, starting from this build. It has been deemed as unnecessary to monitor the results of IOP memory allocation, since IOP memory usually never runs out anymore with modern PS2ESDL builds.
+
+2010/09/06 - v0.744 CB
+========================
+CDVDMAN:
+	-Fixed cdvdman_CdSearchFile(). The part of it that searches directory records is actually a remaint of the original prototype system (Why is it still there?!). Replaced it with the new, final version.
+	-Some CPU performance-related tweaks (In sceCdStRead(); Replaced a modulo division operation with a bitwise operation)).
+
+GUI:
+	-Shifted the exiting of the SifRPC services into launchGame() for a reduction in redundant code.
+
+2010/09/07 - v0.744 CB
+========================
+EE_CORE:
+	-Fixed some possible stack calculation errors.
+
+2010/09/13 - v0.745 CB
+========================
+EE_CORE:
+	-Changed the patch management system.
+	-Shifted Install_Kernel_Hooks() into main.c.
+
+GUI:
+	-Removed the loop when calling SifIopReset(). Sony doesn't even do it, and it doesn't seem like a reset request can ever fail to be sent anyway.
+	-Changed the patch management system.
+	-Cleaned up redundant/leftover code from older builds.
+	-Re-enabled background loading from the place where PS2ESDL was launched from.
+	-Re-added background-loading from the MC (Now fixed).
+	-Added a call to padPortClose() in LaunchGame().
+
+2010/09/14 - v0.745A CB
+========================
+EE_CORE:
+	-Upgraded the ELF patch management system again. This one is confirmed to work.
+	-Armored Core 9 Breaker is now fixed with the prototype PPI file that was generated along with this build.
+
+GUI:
+	-Upgraded the ELF patch management system again. This one is confirmed to work.
+	-Armored Core 9 Breaker is now fixed with the prototype PPI file that was generated along with this build.
+
+2010/09/15 - v0.745B CB
+========================
+CDVDMAN:
+	-Removed it's IRX tag temporarily. "Ratchet & Clank: Up Your Arsenal" seems to be trying to locate this module...
+	-Fixed for games that call CDVDMAN functions without calling sceCdInit() first.
+	-Fixed the status of the CD/DVD hardware that's returned before sceCdInit() is called.
+
+CDVDFSV:
+	-Removed it's IRX tag temporarily. "Ratchet & Clank: Up Your Arsenal" seems to be trying to locate this module...
+
+2010/09/18 - v0.746 CB
+========================
+CDVDMAN:
+	-Cleaned up the debug text in the USB drivers that always get generated into the final ELF file.
+	-Added back the IRX tag. Letting go of "Ratchet & Clank: Up Your Arsenal" since it's a die-hard game that kills HDLoader.
+
+CDVDFSV:
+	-Added back the IRX tag. Letting go of "Ratchet & Clank: Up Your Arsenal" since it's a die-hard game that kills HDLoader.
+
+2010/09/20 - v0.746A CB
+========================
+CDVDMAN:
+	-Adjusted what the FORCESYN option did. Now sceCdStatus() calls sceCdSync() too. Fixes Final Fantasy XII. This move was made, because the previous method to call sceCdSync() at functions like sceCdGetDiskReady() impacted the video playback performance of some games negatively.
+	-Removed 1 EE DMA transfer synchronization step in sceCdStread(). The DMAC can transfer data faster than the USB can transfer data (The DMA transfer will complete before the USB device can overwrite that data).
+
+CDVDFSV:
+	-Added the code than handles thread piority adjustment.
+
+2010/09/21 - v0.746B CB
+========================
+CDVDMAN:
+	-Fixed cdvdman_CdReturnFileInfo() yet again. When will all the bugs there cease to exist? :(
+		It still occasionally returns the LSN of another file of a shorter, but similar name (Grr....).
+	-Fixed open(). It didn't return the actual number of bytes read (But the number of bytes requested to be read).
+
+2010/09/22 - v0.746B CB
+========================
+CDVDMAN:
+	-Fixed DVD9 emulation (It made some disc images appear as DVD9 discs when they were really just DVD5 disc images).
+
+2010/09/24 - v0.746C CB
+========================
+CDVDMAN:
+	-Fixed DVD9 emulation (Layer 1 was inaccessable).
+
+GUI:
+	-Fixed DVD9 emulation (Layer 1 was inaccessable).
+
+2010/09/26 - v0.746D CB
+========================
+CDVDMAN:
+	-Fixed DVD9 emulation (Layer 1 was inaccessable).
+	-Fixed all related functions to file searching for DVD9 support.
+
+GUI:
+	-Fixed DVD9 emulation (Layer 1 was inaccessable).
+
+2010/09/29 - v0.747 CB
+========================
+CDVDMAN:
+	-Prototype support for 4096-byte/non-512-byte sector sized disks.
+	-Cleanup of old, commented-out code.
+	-Removed that unnecessary call to DelayThread cdvdman_send_scmd(), since a call to sceCdReadClock() would also be affected by that call to DelayThread().
+		Some games call sceCdReadClock() excessively... and that call to DelayThread() can really slow things down.
+	-Added back the loop around the call to cdvdman_send_scmd() in sceCdApplyScmd().
+		I don't think that it's wise to sacrifice stability.
+
+GUI:
+	-Improved DVD9 format DVD disc image detection.
+		Some game installers (Namely USButil 2.00) install games onto disc image slices that seem to be able to hold more sectors than the stated number of sectors in the 1st layer (PS2ESDL will then think that it's a DVD9 format disc image).
+	-Fixed LaunchGame(), as it no longer worked with loader.c (Blind/automatic game launcher that's used for development).
+
+EE_CORE:
+	-Added back the code to load a KPRINTF redirection module (But the module isn't working).
+
+2010/10/01 - v0.747A CB
+========================
+GUI:
+	-Added code to automatically recalculate the actual number of sectors in the disc (For those disc images with data stored on sectors that are outside the ISO9660 filesystem).
+
+2010/10/05 - v0.747B CB
+========================
+EE_CORE:
+	-Prototype system that switches the stacked used before the sequence where PS2ESDL resets the IOP with a modified IOP image.
+
+2010/10/06 - v0.748 CB
+========================
+GUI:
+	-Some fixes to configure_cdvdman() to allow the blind/automatic game launcher that's used for development to work properly once again.
+
+CDVDMAN:
+	-A prototype directory record set caching system was added. dread() is broken.
+
+2010/10/07 - v0.748 CB
+========================
+CDVDMAN:
+	-The caching system was improved on, and dread() is *supposedly* fixed.
+
+2010/10/10 - v0.747C CB
+========================
+CDVDMAN:
+	-Fixed sceCdGetReadPos() to return values realtime. Games like "Castle Shikigami 2" rely on it.
+
+2010/10/11 - v0.747C CB
+========================
+GUI:
+	-Fixed a bug in the recalculation of the actual number of sectors in the disc image, for disc images that have more sectors than what's recorded in their ISO9660 filesystem.
+	-Fixed the number of games that can be displayed on the list at any one time (There was a blank row).
+	-Combined all of the delay induction code segments into 1 single function that accepts a delay duration in milliseconds.
+
+CDVDMAN:
+	-Fixed the reading of data into unaligned buffers in IOP memory.
+	-Changed some of those functions that are only called once in the entire module into "inline" functions.
+
+CDVDFSV:
+	-Changed some of those functions that are only called once in the entire module into "inline" functions.
+
+UDPTTY:
+	-Added code to redirect KPRINTF debug messages.
+
+2010/10/13 (2010/10/15)  - v0.749 CB/v0.750 CB
+==============================================
+GUI:
+	-Some fixes to the GUI to make it look and feel more professional.
+
+GLOBAL:
+	-Corrections were made to the names of certain imported compiler header files, and filenames in the makefiles.
+		This is to allow PS2ESDL to be compiled without errors on Unix-compatible systems.
+
+2010/10/28  - v0.751 CB
+==============================================
+EE_CORE:
+	-Cleaned up some code.
+	-Attempted to fix Marvel vs Capcom 2.
+
+GUI:
+	-Some of the game title sorting functions were written (But incomplete).
+	-Some optimizations to the function calls around the IOP reset was done (Perform some data structure initialization on the EE while the IOP resets).
+
+2010/10/28 (2010/10/29)  - v0.751A CB
+==============================================
+EE_CORE:
+	-IOPRP image patching and generation has been shifted into the IOP (A module containing the necessary routines to perform this operation will be loaded).
+
+2010/10/30 - v0.751B CB
+========================
+EE_CORE:
+	-The triggering of the IOP reset with the patched/generated IOPRP image that contains PS2ESDL's CDVDMAN and CDVDFSV modules has been shifted into the IOP.
+
+2010/10/30 - v0.751C CB
+========================
+EE_CORE:
+	-Reverted back to using a modified version of the v0.751's EE core, but it uses the kernel memory at 0x80030000 to store the patched/generated IOPRP image, before transferring it to a buffer in IOP memory after the IOP is reset.
+	-This version allows Marvel vs Capcom 2 to work, but I suppose that those Thunder Pro II users are as good as being sacrificed now. XD
+	-Some size optimizations were made.
+	-Removed KPRTTY, which was a IOP module that was leftover from older builds.
+
+2010/10/31 - v0.752 CB/v0.752A CB
+=================================
+GUI:
+	-Added support for the displaying of Japanese characters with the rom0:KROM FONTX2 file.
+	-v0.752A only: The colour used for "Bolding" of the font is black instead.
+
+2010/11/04 - v0.753 CB
+=======================
+CDVDMAN:
+	-Fixed cdvdman_CdSearchFile() to support dopen() once again (I broke it while trying to create workarounds for buggy games when building v0.74x).
+
+2010/11/14 - v0.753A CB/v0.800 OB
+=================================
+GUI:
+	-Increased the delay between button presses by a little.
+
+Global:
+	-First version of the v0.800 lineup.
+	-A new, prototype version of the PS2ESDL game format is now used (v1.20).
+
+2010/12/11 - v0.801 OB
+======================
+GUI:
+	-Now accepts user input as compatibility mode and cache size overrides when the PS2ESDL game format is used.
+
+EE_CORE:
+	-A new compatibility mode (DELAYED_READ_PATCH) was added.
+	-The patching system was optimized.
+	-The patching mode was modified for better backward compatibility in the future. The old patching system might exhibit undefined behaviour if it encounters a patch unknown to it.
+	-Calls to SyncDCache() were added for data transfers to IOP memory for improved stability.
+
+2010/12/14 - v0.801 OB
+======================
+GUI:
+	-Finalized the new patching system.
+EE_CORE:
+	-Finalized the new patching system.
+CDVDMAN:
+	-Fixed sceCdDiskReady().
+
+2010/12/18 - v0.802 OB
+======================
+GUI:
+	-New game list polling system (Uses SIFCMD).
+Global:
+	-Modified USBD (For the GUI and CDVDMAN) to make it compatible with my case. :S
+
+2010/12/21 - v0.803 OB
+======================
+CDVDFSV [Version 4.20]:
+	-Added support for S-commands #36 and #38.
+CDVDMAN [Version 4.50]:
+	-Fixed the stack corruption issue in cdvdman_open() for games that cause it like SOCOM II. :X
+	-sceCdStInit(), sceCdStStart(), and sceCdStRead() were fixed to make the streaming mechanism working for games that specify odd bankmax and bufmax values (E.g. the value of bufmax can't be divided equally by the value of bankmax).
+	-sceCdStRead() had old, unused code removed.
+	-The sceCdGetError() line in sceCdStRead() was shifted to near the end of it, as that would be probably where SCE would have got the last error code too.
+Global:
+	-Modified USBD to make compatibility with my case better again. :S
+EE_CORE:
+GUI:
+	-Modified the source files to not include POWEROFF.irx, PS2DEV9.irx and UDPTTY.irx (And ERRORTRAP.irx for the EE core) when compiling a release build.
+
+2010/12/22 - v0.803A OB
+=======================
+CDVDMAN:
+	-Fixed sceCdStRead().
+
+2010/12/22 - v0.803B OB
+=======================
+CDVDMAN:
+	-New USBD driver.
+Global:
+	-New USB driver.
+
+2010/12/26 - v0.804 OB
+======================
+CDVDMAN:
+	-Stripped out code that will probably never be used.
+	-Halfed the number of whatever that's supported by the integrated USBD module.
+	-Changed the thread piorities of the integrated USBD module from 0x1E and 0x24 to 0x02 and 0x03 respectively.
+		>>>This fixes Ultraman Fighting Evolution 3 (And probably Crash Bandicoot: The Wrath of Cortex too).
+EE_CORE:
+	-Added support for VMC (WIP).
+Global:
+	-Adding VMC support.
+GUI:
+	-24 sector cache mode added.
+
+2010/12/27 - v0.805 OB
+======================
+EE_CORE:
+	-Patching system modified to support a built-in patch type that can be used to fix games like SFAA.
+GUI:
+	-The patch loading system was modified to stop scanning for patches once one match was found.
+
+2010/12/29 - v0.806 OB
+======================
+GUI:
+	-Prototype VMC support added (Probably broken; The console freezes when attempting to save data).
+
+EE_CORE:
+	-SFAA fix implemented.
+
+2011/01/02 - v0.807 OB
+======================
+GUI:
+	-Added some code to wipe the area from 0x00082000-0x00100000 (This fixes games that uses some memory at 0x00820000).
+Global:
+	-VMC support has been withdrawn (It couldn't be fixed).
+CDVDMAN:
+	-Unused code/redundant checks were removed from the integrated USBSTOR module.
+
+2011/01/18 - v0.808 OB
+======================
+GUI:
+	-Added an options screen.
+	-Added loadable configuration file support.
+	-Fixed support for non-512-byte sector disks.
+USBHDFSD:
+	-Fixed support for non-512-byte sector disks.
+CDVDMAN:
+	-sceCdStRead() fixed. It caused corruption.
+
+2011/01/25 - v0.808 OB
+======================
+GUI:
+	-Re-written to support a file fragmentation check, and for efficiency.
+USBHDFSD:
+	-Prototype file fragmentation check added.
+
+2011/01/28 - v0.808 OB
+======================
+CDVDFSV:
+	-Fixed sceCdReadIOPm() for the EE. It returned the number of sectors read instead of just 1, and it didn't call sceCdSync().
+		The EE expected the RPC function to call sceCdSync().
+CDVDMAN:
+	-Reverted back to the creation and destruction of semaphores for the integrated USBSTOR driver.
+		Some games didn't like the continued usage of a single, non-disposable semaphore.
+GUI:
+	-Fixed the configuration menu.
+	-Organized the code, and split off some of the data structure declarations into other header files.
+
+2011/01/28 - v0.808A OB
+=======================
+GUI:
+	-Fixed the configuration menu (Some options couldn't be saved).
+	-Added an option to disable the game files fragmentation check.
+	-Fixed the issue with an internal game title buffer being too small.
+Global:
+	-Fixed the patch file for SFAA and VDSC.
+EE_CORE:
+	-Patching system fixed for SFAA and VDSC, and for scanning through memory (It won't scan beyond the first match it finds).
+CDVDMAN:
+	-Added a precautionary layer number check.
+
+2011/01/29 - v0.808B OB
+=======================
+GUI:
+	-Added a new video mode: 720x480P.
+	-Removed the option for disabling video interlace.
+	-Modified the configuration/options screen so that the configuration file won't be closed and loaded everytime the user leaves that screen.
+	-Changed the way a selector menu was displayed on the options screen.
+
+2011/02/01 - v0.809 OB
+=======================
+GUI:
+	-Re-designed the way the video mode setting is loaded.
+	-Re-designed the way the configuration file is loaded (It'll only be loaded at startup from the CWD).
+	-Added functionality to override the video mode.
+	-New options were added: "Disable video mode override" and "Select button".
+	-Cleaned up some redundant configuration code.
+
+2011/02/02 - v0.809A OB
+=======================
+GUI:
+	-A fix for PAL consoles was made (As their "natural" video height is 512, NTSC mode doesn't work properly as 448 is NOT a multiple of 256).
+	-Some old, leftover code was cleaned up.
+
+2011/02/02 - v0.810 OB
+=======================
+GUI:
+	-Fixed a small bug with the handling of multiple USB devices.
+	-Changed the maximum size of the background image to 640x448.
+
+2011/02/24 - v0.811 OB
+=======================
+CDVDMAN v4.54:
+	-Removed some leftover fields from the configuration structure.
+CDVDFSV v4.22:
+	-Removed some leftover code that will never be used.
+GUI:
+	-Added a check to prevent PS2ESDL from freezing if a game's files cannot be accessed.
+	-Removed the call to SetVCommonHandler() since PS2ESDL no longer uses kernel memory.
+	-Optimized the GUI a little by setting some structures to static, and by setting some functions to being inline and static.
+	-Fixed the drive table management system. Now PS2ESDL should refresh the game lists if 2 devices were plugged in (With only one having a valid game list), and one was removed.
+	-Modified the configuration screen to reset the screen position correction settings whenever the screen display mode is changed.
+
+Global:
+	-Removed the old MCEMU files.
+
+2011/03/17 - v0.811A OB
+=======================
+GUI:
+	-Cleaned up some old code.
+CDVDMAN:
+	-Added some preventive code to prevent data from being read from sectors that are beyond the end of each disc image slice.
+
+2011/03/26 - v0.812 OB
+=======================
+GUI:
+	-Re-written the GUI to make the addition of new means of loading games easy (Improved scalability).
+	-Skinning support added.
+	-Started writting ISO9660 disc image support.
+
+2011/04/12 - v0.813 OB
+=======================
+CDVDMAN:
+	-Modifications were made in sector_io.c to almost all functions in that file, for performance enhancements.
+	-Modified read_sector() to involve some 64-bit calculations to prevent overflows from occurring.
+
+GUI:
+	-Completed a prototype ISO9660 disc image support system.
+	-Modified calculate_str_crc32() in an attempt to kill the bug where PS2ESDL is unable to access USBExtreme games that have a title of exactly 32 characters in length.
+
+Global:
+	-Some IOCTL codes in USBHDFSD were changed to look professional.
+	-Revamped the PS2ESDL format (v1.22). Changes:
+		*CD-key and reserved fields removed.
+		*CRC32 checksum field added.
+
+2011/04/19 - v0.814 OB
+=======================
+CDVDMAN:
+	-Removed the "-O0" flag from the makefile. It reduced performance by disabling compiler optimization.
+	-Added a prototype workaround/fix for Ironman (Modified sceCdTrayReq()).
+GUI:
+	-Attempted to fix the transparency/colour problem with the GUI again.
+
+2011/04/23 - v0.815 OB
+=======================
+CDVDMAN:
+	-Confirmed and finalized the fix to sceCdTrayReq(). There is indeed a problem with the SCE sceCdTryReq() function: It will return the tray status as 1 at the first call, and only return the correct status at the 2nd call. @_@
+GUI:
+	-Fixed the CRC32 calculation function for USBExtreme games. Now games that have 32-character titles should load.
+	-Implemented basic cursor acceleration. The timming/delay system still needs to be improved on, as polling the pad status currently isn't fast enough, resulting in "ghost" pad presses.
+	-Fixed the problem with structure alignement, so PS2ESDL format v1.22 games will be displayed properly.
+LOADER:
+	-Upgraded it to work with the rest of PS2ESDL properly (It still used obsolete initialization function prototypes).
+
+2011/04/23 - v0.815A OB
+=======================
+GUI:
+	-Modified the system used to poll the pad states (See the TODO remark for the previous log entry).
+		It is also now non-blocking, so I suppose that it's better for the PS2 and should pose less problems for future upgrading...
+	-Now users can warp the cursor to the bottom or top of the game list from the top or bottom of the list respectively (E.g. if the currently selected game entry is the first entry and the user presses UP, warp around to the last game entry).
+
+2011/04/29 - v0.816 OB
+=======================
+GUI:
+	-Cleaned up old multi-device support code.
+	-Modified the entire GUI to use malloc() to allocate memory to store paths, instead of relying on arrays of fixed sizes.
+	-Added more checks and warning screens, to safeguard against potential failures caused by user errors. :D 
+	-Fixed the scrolling system, as pressing UP when the first entry of the list was highlighted might cause a crash/garbled graphics when the displayed list was short.
+	-Added a secret combo code to exit PS2ESDL: SELECT+R1. :p
+	-Changed most char * arguments to const char *. This is to make future code modification clearer.
+	-Enlarged the message box, since most warning and error messages were exceeding the length of the message box.
+	-Adjusted the position of the game list.
+	-Fixed a bug related to the generation of the path to the ISO9660 disc image.
+
+Global:
+	-Recompiled most modules with either the -O3 or -Os optimization level setting, depending on how the modules were to be used.
+		Except for USBD and USBHSDFSD (I can't compile them as I don't have the PS2SDK sources). :(
+	-The Makefiles were edited for better cross-platform compatibility, and to reduce the redundancy of files.
+
+CDVDMAN:
+	-Undid a old debug test at sceCdCallback().
+	-Optimized cdrom_read().
+
+2011/04/30 - v0.817 OB
+=======================
+GUI:
+	-Added calls to waitPad1Clear() to some error messages, so that accidental launching of games cannot happen.
+	-Bundled with the Rugby League 2: World Cup Edition fix (In patches.ppi).
+
+2011/05/03 - v0.817 OB
+=======================
+CDVDMAN:
+	-Modified sceCdSync() to treat mode 11 as mode 1. Fixes games like Otome wa Boku ni Koishiteru that used to suffer from stuttering audio.
+	-Renamed cdvdmanc.c and cdvdmanf.c to cdvdman_main.c and cdvdman_internal.c respectively.
+
+CDVDFSV:
+	-Renamed cdvdmanc.c and cdvdmanf.c to cdvdman_main.c and cdvdman_internal.c respectively.
+
+GUI:
+	-Modified the pad polling code so that the game launching buttons and the game format selector buttons won't be usable without a single valid game list loaded.
+		This is to prevent any potential problems from arising.
+	-Fixed a problem that might occur while debugging: Messages about no skins beign loaded were once spammed.
+
+2011/06/03 - v0.818 OB
+=======================
+GUI:
+	-Added prototype plugin support.
+
+2011/06/04 - v0.818 OB
+=======================
+GUI:
+	-Added prototype plugin support.
+	-Fixed plugin and internal driver loading.
+	-Added a game title sorting option.
+
+2011/06/08 - v0.818A OB
+=======================
+GUI:
+	-Fixed a bug that might cause the PS2 to crash in SwapDisplayedGameList() if CurrentListIndexNumber was SYSTEM_INVALID.
+		The bug where the "No device found" message appears when only ISO9660 disc images were present is fixed as a result.
+	-Started working on skin configuration support.
+	-Re-added a list type indicator.
+
+2011/06/11 - v0.818B OB
+=======================
+GUI:
+	-Fixed a bug that caused the CDVDMAN modules of plugins to not be configured.
+	-Completed the iLink extension. Tested, and is working.
+	-Plugin loading support has been fixed. Tested, and is working.
+	-Skin configuration support has been worked on again today.
+	-Skins are now seperated into 2 parts: The game list area and the legend.
+
+2011/06/11 - v0.818C OB
+=======================
+GUI:
+	-Skins are now one-piece again.
+
+2011/06/12 - v0.818D OB
+=======================
+GUI:
+	-Skin parameter file loading system is now fixed, functional and working.
+	-More parameters are now accepted to allow more flexible skin tailoring.
+	-SkinParaBuild utility (Skin parameter building utility) is now working.
+
+2011/06/20 - v0.819 OB
+=======================
+Global:
+	-The loader used for testing was overhauled and upgraded to work with the newer PS2ESDL system.
+		It can only be used to debug games with a USB device that only has one FAT12/FAT16/FAT32 partition.
+	-CWD calculation code has been replaced with a system that dynamically allocates a string with just enough space for the CWD.
+		|->PS2ESDL frees this buffer before executing the game's ELF!!
+GUI:
+	-Graphics mode setting system was overhauled. No more garbled graphics should be seen beyond the edges of the visible screen.
+	-Fixed a bug that manifests in a few places and resulted in some user options not being handled properly (Notably the "Disable video mode override" option).
+	-Fixed a bug which might have resulted in USBExtreme games not loading (Or just not loading properly).
+		The game list ID for USBExtreme games was accidentally set to SYSTEM_PS2ESDL.
+	-The bug that resulted in the game list blanking out has been vanquished. :D:D:D:D:D
+		The bug was a really hard to spot one: It was cloaked, hidden from sight.... and was a result of some important code not being run due to the flow of command in the main GUI loop.
+		 |->Code for recalculating old_list_bottom_ID was shifted to near the end of the loop, so that it'll be run immediately after the user pressed buttons.
+
+2011/06/20 - v0.819A/v0.820 OB
+==============================
+iLink extension:
+	-(GUI) SIF command #13 is sent when all connections are terminated (Otherwise, it might not even be sent).
+
+GUI:
+	-Graphics mode setting system overhauled yet again.
+		Now changing the video mode will not cause graphics corruption, with the exception of the 480P mode due to a lack of VRAM.
+		480P mode will have a resolution of 640x480 instead of 720x480, as there will be insufficient VRAM left for PS2ESDL.
+	-Screen alignment function fixed and the red box was realigned.
+
+CDVDMAN:
+	-Fixed a horrible miscalculation of mine.
+		The fix to sceCdSync()in 2011/05/03 was a mistake. It should be mode 17 (0x11) instead of mode 11. @_@
+
+2011/06/22 - v0.821 OB
+======================
+GUI:
+	-The screen will now be automatically re-centered when the 480P mode is used.
+	-The bug that causes the ISO9660 disc image game list to blank out has been KILLED for real.
+
+2012/02/24 - v0.823 OB
+======================
+GUI:
+	-The screen will now be automatically re-centered when the 480P mode is used. (Fixed)
+	-Fixed many logic errors that could impede stability.
+	-PS2LOGO will now be launched, so that the player's play history will get updated and hence the "towers" on the Sony Playstation 2 screen will grow and multiply as they should.
+	-Fixed graphics mode switching. No more garbled graphics.
+	-Corrected the RGBA values used with loaded PNG images. The reason why I could never get the alpha values right was because of a bug in the PNG loading function in gsToolkit. It didn't invert the alpha values.
+	-Due to the above, the alpha test (Which was really too aggressive) is no longer needed and was removed.
+	-Replaced my old quicksort algorithm with a call to the C qsort() function.
+
+CDVDMAN:
+	-Fixed one bug related to calling AllocSysMemory() and FreeSysMemory() without suspending interrupts in cdvdman.c (According to my understanding of the Sony technical documentation, AllocSysMemory() and FreeSysMemory() are critical sections and need to be run with interrupts disabled).
+EE core:
+	-Changed the EE core to one that doesn't rely on the IOP memory allocation hack. The new core uses rom0:UDNL's ability to load IRX modules from a list of IOPRP images.
+
+2012/02/29 - v0.823A OB
+=======================
+iLink extension:
+	-New rewritten version with DMA support ported over (v0.98H).
+
+EE core:
+	-Re-added the first IOP reset in an attempt to re-gain compatibility with certain buggy titles like SNK vs Capcom 2.
+
+GUI:
+	-PS2LOGO can now be (optionally) launched. This will only work if the game's logo section (first 16 sectors) is decrypted. Currently not doable with any versions of PS2DCDMP.
+	-GSM has been integrated. Games are now forced to run at 480P video mode.
+		TODO: Make this feature toggleable.
+	-The redundant SourceDevice field in the configuration structure has been shifted into the SkinDisplayData structure.
+
+CDVDMAN:
+	-Fixed many, many bugs related to calling AllocSysMemory() and FreeSysMemory() without suspending interrupts (According to my understanding of the Sony technical documentation, AllocSysMemory() and FreeSysMemory() are critical sections and need to be run with interrupts disabled).
+	-CRITICAL: Fixed support for disks of sector sizes >2048 bytes. The call to AllocSysMemory() in sectorIO.c was faulty as the first and second parameters were swapped around.
+
+2014/04/11 - v0.823R OB
+=======================
+EE core:
+	-Changed the EE core again with a new design that is more compatible. Old plugins are now unsupported.
+	-This new EE core uses a customized UDNL module that shuts off all DMA channels before the final phase of the IOP reset, to avoid memory corruption by interfaces like USB.
+
+GUI:
+	-Removed GSM.
+
+CDVDMAN:
+	-Removed the Sony debugging modules from the banned modules list as DECI2.IRX doesn't exist as a standalone IRX and I don't know what SNMON.IRX is.
+	-Changed where the temporary buffer for disks with sectors larger than 2048 bytes is created, for better performance.
+
+2014/04/12 - v0.824 OB
+======================
+-A merger of all changes from v0.821 to v0.824.
+
+2014/05/17 - v0.825 OB
+======================
+GUI:
+	-Added the play history updating functionality from FMCB.
+	-Refactored some code.
+
+CDVDMAN:
+	-Fixed sceCdGetReadPos(), which was returning the number of sectors read instead of the read offset in bytes.
+
+EE core:
+	-Readded the EESYNC module to prevent DNAS games from wiping memory after every IOP reset.
+
+Overall:
+	-Recompiled with the latest PS2SDK, partly for compatibility with the PlayStation 3.

@@ -1,0 +1,15 @@
+/* A structure that defines a patch type. */
+struct PS2ESDL_patchType{
+	u32 src[4];		/* Offset (Only the 1st element is used, the other 3 are ignored)/sample of the original data that needs to be patched, and is to be search for. */
+	u32 mask[4];		/* Source pattern Mask (Optional; If unneeded, just fill it with 0xFF bytes). */
+	u32 patchData[4];	/* Data that is to replace the original data in the game's ELF that is loaded into memory (Or the offset relative to the offset of the pattern found that should be patched). */
+} __attribute__((packed));
+
+					src		mask
+					=========== ============
+0000302d daddu a2, zero, zero		2D 30 00 00  FF FF FF FF
+0c051b4c jal $XXXXXXXX			00 00 00 0C  00 00 00 0C
+0000382d daddu a3, zero, zero		2D 38 00 00  FF FF FF FF
+3c020018 lui XX, $XXXX			00 00 00 3C  00 00 00 3C
+
+PatchData (Offset): 0x01, 0x0A (10th module).

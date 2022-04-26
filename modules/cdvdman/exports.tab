@@ -1,0 +1,130 @@
+void _funcret(){};
+
+DECLARE_EXPORT_TABLE(cdvdman, 1, 1)
+	DECLARE_EXPORT(_start)			/* 000 */
+	DECLARE_EXPORT(_funcret)
+	DECLARE_EXPORT(_exit)			/* 002 */
+	DECLARE_EXPORT(_funcret)		/* 003; cdvdman_termcall */
+	DECLARE_EXPORT(sceCdInit)		/* 004 */
+	DECLARE_EXPORT(sceCdStandby)		/* 005 */
+	DECLARE_EXPORT(sceCdRead)		/* 006 */
+	DECLARE_EXPORT(sceCdSeek)		/* 007 */
+	DECLARE_EXPORT(sceCdGetError)		/* 008 */
+	DECLARE_EXPORT(invalid_export)		/* 009; sceCdGetToc */
+	DECLARE_EXPORT(sceCdSearchFile)		/* 010 */
+	DECLARE_EXPORT(sceCdSync)		/* 011 */
+	DECLARE_EXPORT(sceCdGetDiskType)	/* 012 */
+	DECLARE_EXPORT(sceCdDiskReady)		/* 013 */
+	DECLARE_EXPORT(sceCdTrayReq)		/* 014 */
+	DECLARE_EXPORT(sceCdStop)		/* 015 */
+	DECLARE_EXPORT(sceCdPosToInt)		/* 016 */
+	DECLARE_EXPORT(sceCdIntToPos)		/* 017 */
+	DECLARE_EXPORT(invalid_export)		/* 018 */
+	DECLARE_EXPORT(invalid_export)		/* 019; sceCdGetToc2 */
+	DECLARE_EXPORT(sceCdRead)		/* 020; sceCdReadDVDV */
+	DECLARE_EXPORT(sceCdCheckCmd)		/* 021 */
+	DECLARE_EXPORT(sceCdRI)			/* 022 */
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(sceCdReadClock)		/* 024 */
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(sceCdStatus)		/* 028 */
+	DECLARE_EXPORT(sceCdApplySCmd)		/* 029 */
+	DECLARE_EXPORT(invalid_export)		/* 030; sceCdSetHDMode */
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)		/* 035; sceCdReadKey */
+	DECLARE_EXPORT(invalid_export)		/* 036; sceCdDecSet */
+	DECLARE_EXPORT(sceCdCallback)		/* 037 */
+	DECLARE_EXPORT(sceCdPause)		/* 038 */
+	DECLARE_EXPORT(sceCdBreak)		/* 039 */
+	DECLARE_EXPORT(sceCdRead)		/* 040 */
+	DECLARE_EXPORT(sceCdReadConsoleID)	/* 041 */
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)		/* 043; sceCdMV */
+	DECLARE_EXPORT(sceCdGetReadPos)		/* 044 */
+	DECLARE_EXPORT(sceCdCtrlADout)		/* 045 */
+	DECLARE_EXPORT(invalid_export)		/* 046; sceCdNop */
+	DECLARE_EXPORT(invalid_export)		/* 047; sceGetFsvRbuf */
+	DECLARE_EXPORT(invalid_export)		/* 048; sceCdstm0Cb */
+	DECLARE_EXPORT(invalid_export)		/* 049; sceCdstm1Cb */
+	DECLARE_EXPORT(sceCdSC)			/* 050 */
+	DECLARE_EXPORT(sceCdReadClock)		/* 051; sceCdRC */
+	DECLARE_EXPORT(invalid_export)		/* 052; sceCdForbidDVDP */
+	DECLARE_EXPORT(invalid_export)		/* 053; sceCdReadSUBQ */
+	DECLARE_EXPORT(sceCdApplyNCmd)		/* 054 */
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(sceCdStInit)		/* 056 */
+	DECLARE_EXPORT(sceCdStRead)		/* 057 */
+	DECLARE_EXPORT(sceCdStSeekF)		/* 058; sceCdStSeek -> sceCdStSeekF */
+	DECLARE_EXPORT(sceCdStStart)		/* 059 */
+	DECLARE_EXPORT(sceCdStStat)		/* 060 */
+	DECLARE_EXPORT(sceCdStStop)		/* 061 */
+	DECLARE_EXPORT(sceCdRead)		/* 062 */
+	DECLARE_EXPORT(sceCdRead)		/* 063; sceCdRV */
+	DECLARE_EXPORT(invalid_export)		/* 064 */
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(sceCdReadChain)		/* 066 */
+	DECLARE_EXPORT(sceCdStPause)		/* 067 */
+	DECLARE_EXPORT(sceCdStResume)		/* 068 */
+	DECLARE_EXPORT(invalid_export)		/* 069; sceCdForbidRead */
+	DECLARE_EXPORT(invalid_export)		/* 070; sceCdBootCertify */
+	DECLARE_EXPORT(invalid_export)		/* 071; sceCdSpinCtrlIOP */
+	DECLARE_EXPORT(invalid_export)		/* 072; sceCdBlueLEDCtl */
+	DECLARE_EXPORT(sceCdCancelPOffRdy)	/* 073 */
+	DECLARE_EXPORT(sceCdPowerOff)		/* 074 */
+	DECLARE_EXPORT(invalid_export)		/* 075 */
+	DECLARE_EXPORT(sceCdRead)		/* 076;sceCdReadFull */
+	DECLARE_EXPORT(sceCdStSeekF)		/* 077 */
+	DECLARE_EXPORT(sceCdPOffCallback)	/* 078 */
+	DECLARE_EXPORT(sceCdReadDiskID)		/* 079 DNAS */
+	DECLARE_EXPORT(sceCdReadGUID)		/* 080 DNAS */
+	DECLARE_EXPORT(invalid_export)		/* 081; sceCdSetTimeout */
+	DECLARE_EXPORT(sceCdReadModelID)	/* 082 DNAS */
+	DECLARE_EXPORT(sceCdReadDvdDualInfo)	/* 083 */
+	DECLARE_EXPORT(sceCdLayerSearchFile)	/* 084 */
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(sceCdStatus)		/* 090; sceCdStatus2 */
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(sceCdApplySCmd)		/* 112; sceCdApplySCmd2 */
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(sceCdRead)		/* 114; sceCdReadIOPm */
+	DECLARE_EXPORT(invalid_export)		/* 115; sceCdRcBypassCtl */
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(invalid_export)
+	DECLARE_EXPORT(sceCdApplySCmd)		/* 125;cdvdman_125 */
+END_EXPORT_TABLE

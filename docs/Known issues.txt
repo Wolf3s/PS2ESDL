@@ -1,0 +1,6 @@
+-In 480P mode, the background will be corrupted.
+	The reason for that is a lack of VRAM. In order to be able to draw everything on the screen with gsKit with only 4MB of VRAM,
+		the screen will have a resolution of 640x480 instead of 720x480.
+	This causes corruption as 640 isn't a multiple of the screen length (1440 units, I think).
+
+Last updated: 2011/06/20

@@ -1,0 +1,74 @@
+Byte order is unknown, but I suppose that data is stored with the MSB then LSB.
+All event flags are 32-bit.
+
+How the cdvdman_intr_ef flag works (N-command and DMA operations, in theory):
+1. N-command is sent (sceCdApplyNCmd keeps sending N-command until it is sucessfully sent, cdvdman_ncmd_ef bit 0 is cleared)
+2. N-command data is sent via DMA ch. 3 (cdvdman_intr_ef-> Bit 0 is cleared, and ALL bits but  Bit 5 are cleared after DMA transfer)
+3. After N-command is sent by cdvdman_send_ncmd,  cdvdman_intr_ef Bit 0 is set, all other bits are cleared, cdvdman_ncmd_ef bit 0 is set.
+4. The DMA ch. 3 interrupt is triggered when DMA transfer is completed, cdvdman_intr_ef ALL bits but bit 5 are cleared (Or bit 5 is set), Interrupt callback is then called, cdvdman_intr_ef-> Bit 0, 3 and 5 are set
+5. The CD/DVD interrupt is triggered by the CD/DVD hardware after N-command is completed (Interrupt callback is called, cdvdman_intr_ef-> Bit 0, 3 and 5 are set)
+
+cdvdman_ncmd_ef - Indicates whether a N-command is being sent.
+
+Bit 32				Bit 0
+=================================
+11111111111111111111111111111111
+=================================
+
+Bit 0:	Set - N-command was sent
+	Cleared - N-command is currently being sent.
+------------------------------------------------
+cdvdman_scmd_ef - Indicates whether a S-command is being sent.
+
+Bit 32				Bit 0
+=================================
+11111111111111111111111111111111
+=================================
+
+Bit 0:	Set - S-command was sent
+	Cleared - S-command is currently being sent.
+------------------------------------------------
+cdvdman_intr_ef - Indicates current CD/DVD drive hardware operations
+
+Known values:	0x29 - Bits 0, 3 and 5 are set; Set during CD/DVD hardware interrupt callback, and during CDVDMAN initilization
+		0x21 - Bits 0 and 5 are set.
+		0x20 - Bit 5 is set.
+		0x10 - Bit 4 is set.
+		0x04 - Bit 2 is set.
+
+Bit 32				Bit 0
+=================================
+11111111111111111111111111111111
+=================================
+
+Bit 0:	Set - N-command completed.
+	Cleared - N-command is being sent.
+
+Bit 2:	Set - Set by CDVDFSV to trigger a Power-Off callback from EE
+
+Bit 3:	Set - By CDVDSTM during cdvdman_intrcall() call, and during CDVDMAN initilization and CD/DVD interrupt handling.
+
+Bit 4:	Set - Power-off flag, set CD/DVD interrupt handler, or by FILEIO.
+
+Bit 5:	Set -  DMA ch.3 data transfer is complete (Set by DMA Ch.3 handler)
+	Cleared - Start of DMA ch.3 data transfer
+
+/*
+ INTR Event Flag:
+ 0x01 - set when n-cmd is complete, clear before n-cmd sent, used by sceCdSync()
+ 0x04 - set by CDROM interrupt handler, used by CDVDFSV to trigger a Power-Off callback on EE
+ 0x08 - set by CDVDSTM module, set by cdvdman_intrcall()
+ 0x10 - set by CDROM interrupt handler, user by FILEIO to trigger a Power-Off callback on EE
+ 0x20 - set by DMA Ch.3 handler when transfer is complete, clear before DMA Ch.3 transfer start
+ */
+
+cdvdman_read_ef - Indicates whether a read operation is in progress
+
+Bit 32				Bit 0
+=================================
+11111111111111111111111111111111
+=================================
+
+Bit 0:	Set - No read operation is in progress
+	Cleared - Read operation in progress
+------------------------------------------------

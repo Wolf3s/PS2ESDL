@@ -1,0 +1,10 @@
+For all DVDs, the layer break point:
+
+    * must be less than 2,074,496 sectors (so that layer 0 does not exceed 2,074,496 sectors, the maximum capacity of a DVD-9 layer)
+    * can not be within a 16-sector ECC block (must be on a sector that is evenly divisible by 16)
+
+For Opposite Track Path (OTP) discs (all DVD-Video titles, and all titles written to Double Layer recordable DVDs) the layer break:
+
+    * must be greater than 1/2 the total sectors of the disc (insuring that layer 0 is bigger than layer 1)
+
+*** The last 15 sectors of layer 0 contain the 1st 15 sectors of layer 1. ***
